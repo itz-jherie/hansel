@@ -41,7 +41,7 @@ function Feed() {
           </div>
 
           {/* Filter bar — sticky glass */}
-          <div className="sticky top-0 z-[4] flex flex-col gap-2 border-b border-line bg-glass px-5 py-3 backdrop-blur-[20px] min-[810px]:flex-row min-[810px]:items-center min-[810px]:justify-between min-[810px]:px-[22px] min-[1200px]:px-[30px] max-[809px]:mx-[14px] max-[809px]:rounded-[12px] max-[809px]:border max-[809px]:top-[72px]">
+          <div className="sticky top-0 z-[4] flex flex-col gap-2 border-b border-line bg-glass py-3 backdrop-blur-[20px] min-[810px]:flex-row min-[810px]:items-center min-[810px]:gap-4 min-[810px]:justify-between min-[810px]:py-[14px] min-[810px]:px-[22px] min-[1200px]:py-[15px] min-[1200px]:px-[30px] max-[809px]:mx-[14px] max-[809px]:rounded-[12px] max-[809px]:border max-[809px]:px-[10px] max-[809px]:top-[72px]">
             <FilterPills value={filter} onChange={setFilter} />
             <SortPills value={sort} onChange={(v) => setSort(v as SortMode)} />
           </div>
@@ -62,7 +62,7 @@ function Feed() {
               No posts match — try another category or search.
             </p>
           ) : (
-            <main className="grid grid-cols-2 gap-[10px] p-3 pb-10 min-[810px]:grid-cols-3 min-[810px]:gap-[18px] min-[810px]:px-[22px] min-[810px]:py-4 min-[810px]:pb-24 min-[1200px]:gap-6 min-[1200px]:px-[30px] min-[1200px]:pb-[60px] min-[1200px]:pt-[18px]">
+            <main className="grid grid-cols-2 gap-[10px] px-[14px] pb-10 pt-3 min-[810px]:grid-cols-3 min-[810px]:gap-[18px] min-[810px]:px-[22px] min-[810px]:pb-24 min-[810px]:pt-4 min-[1200px]:gap-6 min-[1200px]:px-[30px] min-[1200px]:pb-[60px] min-[1200px]:pt-[18px]">
               {visible.map((p, i) => (
                 <ProjectCard key={p.id} project={p} index={i} />
               ))}
@@ -70,7 +70,7 @@ function Feed() {
           )}
 
           {/* Mobile footer */}
-          <footer className="flex-col gap-1.5 px-[18px] pb-12 text-[13px] text-smoke flex min-[810px]:hidden">
+          <footer className="flex-col gap-1.5 px-[18px] pb-12 pt-7 text-[13px] text-smoke flex min-[810px]:hidden">
             <div className="flex items-start gap-2">
               <AvailabilityDot />
               <p>Open for artist submissions.</p>
