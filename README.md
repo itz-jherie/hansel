@@ -20,7 +20,12 @@ database yet.
 npm install
 npm run dev     # http://localhost:3000, with hot reload
 npm run build   # static export -> ./out
+npm start       # serve ./out at http://127.0.0.1:8000
 ```
+
+`npm start` runs `scripts/serve.mjs`, a zero-dependency static file server for
+the exported `out/` folder — it reproduces what a static host serves, so the
+local preview matches production.
 
 ## Deploying
 
@@ -39,8 +44,7 @@ Node server, only static file hosting.
 To preview exactly what will be deployed:
 
 ```bash
-npm run build
-npx serve out        # or: python3 -m http.server 8000 --directory out
+npm run build && npm start   # serves ./out on :8000
 ```
 
 Images use `unoptimized: true` (required for static export, since there's no

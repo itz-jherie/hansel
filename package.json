@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "node scripts/serve.mjs",
+    "preview": "node scripts/serve.mjs"
   },
   "dependencies": {
-    "@next/swc-darwin-arm64": "file:../../../../tmp/swc.tgz",
-    "next": "file:../../../../tmp/next.tgz",
+    "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
