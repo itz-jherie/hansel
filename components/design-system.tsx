@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
-import { categories, sorts } from "@/lib/tokens";
+import { sorts } from "@/lib/tokens";
+import { categories } from "@/lib/projects";
 
 /* ---------- pills ---------- */
 export function Pill({
@@ -26,17 +27,21 @@ export function Pill({
   );
 }
 
-export function FilterPills({
+export function FilterPills<T extends string>({
   value,
   onChange,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  value: T;
+  onChange: (v: T) => void;
 }) {
   return (
     <div className="no-scrollbar flex gap-2 overflow-x-auto">
       {categories.map((c) => (
-        <Pill key={c.id} active={value === c.id} onClick={() => onChange(c.id)}>
+        <Pill
+          key={c.id}
+          active={value === c.id}
+          onClick={() => onChange(c.id as T)}
+        >
           {c.label}
         </Pill>
       ))}
