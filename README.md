@@ -18,10 +18,33 @@ database yet.
 
 ```bash
 npm install
-npm run dev     # http://localhost:3000
-npm run build   # production build
-npm run start   # serve the production build
+npm run dev     # http://localhost:3000, with hot reload
+npm run build   # static export -> ./out
 ```
+
+## Deploying
+
+`next.config.ts` sets `output: "export"`, so `npm run build` emits a fully
+static site into `out/`. That folder is the deployable artifact — it needs no
+Node server, only static file hosting.
+
+| Host | Setting |
+| --- | --- |
+| Vercel | Import repo, framework auto-detects Next.js, build `npm run build` |
+| Netlify | Build `npm run build`, publish `out` |
+| Cloudflare Pages | Build `npm run build`, output `out` |
+| GitHub Pages | Build `npm run build`, publish `out` to the branch |
+| Any static host / S3 | Upload the `out` folder |
+
+To preview exactly what will be deployed:
+
+```bash
+npm run build
+npx serve out        # or: python3 -m http.server 8000 --directory out
+```
+
+Images use `unoptimized: true` (required for static export, since there's no
+optimization server) and load directly from `picsum.photos`.
 
 ## Design system
 
