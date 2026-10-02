@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { useDemo } from "@/lib/demo-store";
-import { formatCompact, imgUrl } from "@/data/projects";
+import { formatCompact, imgUrl, catLabel } from "@/data/projects";
 import { categories, type Category } from "@/lib/tokens";
 import {
   Field,
@@ -82,7 +82,7 @@ export function Dashboard() {
         <div className="border-b border-line p-4 min-[810px]:border-b-0 min-[810px]:border-r min-[810px]:p-5">
           <div className="flex items-center gap-2.5">
             <Image
-              src={user?.avatar ?? "https://picsum.photos/seed/demo-user/112/112"}
+              src={user?.avatar || "https://picsum.photos/seed/demo-user/112/112"}
               alt="Profile"
               width={40}
               height={40}
@@ -132,7 +132,7 @@ export function Dashboard() {
                   {savedPosts.map((p) => (
                     <div key={p.id} className="group relative overflow-hidden rounded-[8px] bg-cloud">
                       <button onClick={() => { setDash(false); openPost(p.id); }} className="block w-full">
-                        <Image src={imgUrl(p.seed, 400, 400)} alt={p.username} width={400} height={400} className="aspect-square w-full object-cover" />
+                        <Image src={p.image || imgUrl(p.seed, 400, 400)} alt={p.username || p.title} width={400} height={400} className="aspect-square w-full object-cover" />
                       </button>
                       <button
                         onClick={() => toggleSave(p.id)}
@@ -141,7 +141,7 @@ export function Dashboard() {
                       >
                         <IconBookmark filled />
                       </button>
-                      <p className="bg-white px-2 py-1.5 font-mono text-[11px]">@{p.username}</p>
+                      <p className="bg-white px-2 py-1.5 font-mono text-[11px]">@{p.username || p.title}</p>
                     </div>
                   ))}
                 </div>
@@ -164,11 +164,11 @@ export function Dashboard() {
                   {myPosts.map((p) => (
                     <div key={p.id} className="rounded-[12px] border border-line p-3">
                       <div className="flex items-center gap-3">
-                        <Image src={imgUrl(p.seed, 200, 200)} alt="" width={56} height={56} className="h-14 w-14 rounded-[8px] object-cover" />
+                        <Image src={p.image || imgUrl(p.seed, 200, 200)} alt="" width={56} height={56} className="h-14 w-14 rounded-[8px] object-cover" />
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-medium">@{p.username}</p>
+                          <p className="truncate text-[14px] font-medium">@{p.username || p.title}</p>
                           <p className="truncate font-mono text-[11px] text-fog">
-                            {p.category} · ♥ {formatCompact(p.likes)} · {formatCompact(p.views)} views
+                            {catLabel(p.category)} · ♥ {formatCompact(p.likes)} · {formatCompact(p.views)} views
                           </p>
                         </div>
                         <a href={p.originalLink} target="_blank" rel="noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full border border-line-strong" aria-label="Open original">
@@ -192,7 +192,7 @@ export function Dashboard() {
                         </div>
                       ) : (
                         <div className="mt-3 flex gap-2">
-                          <GhostBtn onClick={() => { setEditing(p.id); setEditLink(p.originalLink); setEditCat(p.category); }}>Edit</GhostBtn>
+                          <GhostBtn onClick={() => { setEditing(p.id); setEditLink(p.originalLink ?? ""); setEditCat(p.category); }}>Edit</GhostBtn>
                           <GhostBtn danger onClick={() => removePost(p.id)}>Delete</GhostBtn>
                         </div>
                       )}
@@ -207,7 +207,7 @@ export function Dashboard() {
             <div className="flex max-w-[420px] flex-col gap-4">
               <h3 className="text-[20px] font-medium">Settings</h3>
               <div className="flex items-center gap-3">
-                <Image src={user?.avatar ?? ""} alt="" width={56} height={56} className="h-14 w-14 rounded-full bg-cloud object-cover" />
+                <Image src={user?.avatar || "https://picsum.photos/seed/demo-user/112/112"} alt="" width={56} height={56} className="h-14 w-14 rounded-full bg-cloud object-cover" />
                 <div>
                   <GhostBtn onClick={() => fileRef.current?.click()}>Upload picture</GhostBtn>
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => pickAvatar(e.target.files?.[0])} />

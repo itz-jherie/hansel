@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const instrument = Instrument_Sans({
   variable: "--font-instrument",
@@ -15,9 +16,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hansler · Independent Designer",
+  title: "Motion Vault · Curated motion design feed (demo)",
   description:
-    "Working across identity, digital and image. A handful of projects a year.",
+    "Demo preview: a Hansler-style masonry feed for 3D Motion, 2D Motion, VFX and 3D Renders with saves, submissions and an admin queue — all mocked in the browser.",
 };
 
 export default function RootLayout({
@@ -26,9 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${instrument.variable} ${plexMono.variable}`}>
-      <body className="min-h-screen bg-paper text-ink font-sans">
-        {children}
+    <html
+      lang="en"
+      className={`${instrument.variable} ${plexMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body
+        className="min-h-screen bg-paper text-ink font-sans"
+        suppressHydrationWarning
+      >
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

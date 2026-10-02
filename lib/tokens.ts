@@ -25,7 +25,7 @@ export const tokens = {
   },
   layout: {
     sidebarWidth: 300,
-    radius: { card: 1, pill: 15, avatar: 14, bar: 13 },
+    radius: { card: 5, pill: 15, avatar: 14, bar: 13 },
     gap: { feedDesktop: 24, feedTablet: 18, feedMobile: 10 },
   },
   breakpoint: {
@@ -34,15 +34,42 @@ export const tokens = {
   },
 } as const;
 
-export type Category = "3d-motion" | "2d-motion" | "vfx" | "renders";
+export type Category =
+  | "3d-motion"
+  | "2d-motion"
+  | "vfx"
+  | "3d-renders";
 
 export const categories: { id: Category | "all"; label: string }[] = [
   { id: "all", label: "All" },
   { id: "3d-motion", label: "3D Motion" },
   { id: "2d-motion", label: "2D Motion" },
   { id: "vfx", label: "VFX" },
-  { id: "renders", label: "3D Renders" },
+  { id: "3d-renders", label: "3D Renders" },
 ];
+
+/** Legacy Hansler template categories → motion-vault categories (mock migration). */
+export const legacyCategoryMap: Record<string, Category> = {
+  web: "3d-motion",
+  product: "3d-renders",
+  systems: "2d-motion",
+  photography: "3d-renders",
+  graphic: "2d-motion",
+  motion: "3d-motion",
+  renders: "3d-renders",
+};
+
+export function normalizeCategory(raw: string): Category {
+  const key = raw.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  if (
+    key === "3d-motion" ||
+    key === "2d-motion" ||
+    key === "vfx" ||
+    key === "3d-renders"
+  )
+    return key;
+  return legacyCategoryMap[key] ?? "3d-motion";
+}
 
 export type SortMode = "recent" | "popular";
 

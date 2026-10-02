@@ -1,146 +1,143 @@
-import Image from "next/image";
-import { useDemo } from "@/lib/demo-store";
-import { AvailabilityDot, IconIG, IconMail, IconPlus, YearPill } from "./design-system";
+"use client";
 
-const linkCls =
-  "w-fit py-1 text-[15px] leading-[1.2] tracking-[-0.01em] text-smoke transition-colors duration-200 hover:text-ink";
+import Image from "next/image";
+import Link from "next/link";
+import { useDemo } from "@/lib/demo-store";
+import { AvailabilityDot, IconArrow } from "./design-system";
 
 export function Sidebar() {
-  const { user, setAuth, setDash, setSubmit, setAdmin, pending } = useDemo();
+  const { user, setAuth, setDash, setSubmit, setAdmin } = useDemo();
 
   return (
-    <aside className="fixed bottom-0 left-0 top-0 z-10 hidden h-screen w-[300px] flex-col gap-[22px] overflow-y-auto border-r border-line bg-glass px-7 pb-7 pt-9 backdrop-blur-[22px] min-[1200px]:flex">
+    <aside className="fixed bottom-0 left-0 top-0 z-10 hidden h-screen w-[300px] flex-col justify-between overflow-y-auto border-r border-line bg-glass px-7 pb-7 pt-9 backdrop-blur-[22px] min-[1200px]:flex">
+      {/* Identity — Hansler layout preserved */}
       <div>
-        <a href="#" aria-label="About" className="block w-fit">
+        <Link href="/" aria-label="Motion Vault home" className="block w-fit">
           <Image
-            src="https://picsum.photos/seed/hansler-avatar/112/112"
-            alt="Platform"
+            src="https://picsum.photos/seed/motion-vault-mark/112/112"
+            alt="Motion Vault"
             width={56}
             height={56}
-            className="h-14 w-14 rounded-[14px] bg-cloud object-cover grayscale"
+            className="h-14 w-14 rounded-[14px] object-cover grayscale transition-transform duration-300 hover:scale-[1.02]"
           />
-        </a>
+        </Link>
         <div className="mt-[18px] flex items-center gap-2.5">
-          <a href="./" className="text-[19px] font-medium leading-[1.3] tracking-[-0.015em]">
+          <Link
+            href="/"
+            className="text-[19px] font-medium leading-[1.3] tracking-[-0.015em] text-ink"
+          >
             Motion Vault
-          </a>
-          <YearPill>2026</YearPill>
+          </Link>
+          <span className="rounded-full border border-line-strong px-2 py-[3px] font-mono text-[11px] uppercase leading-[1.2] tracking-[0.07em] text-ink">
+            2026
+          </span>
         </div>
-        <p className="mt-2 max-w-[230px] text-[13px] leading-[1.45] tracking-[-0.02em] text-fog">
-          A home for motion designers — 3D, 2D, VFX and renders, curated daily.
+        {/* Stage 1 §4 — short about text */}
+        <p className="mt-2 text-[13px] leading-[1.45] tracking-[-0.02em] text-[#6b6b6b]">
+          A curated feed for motion designers — 3D, 2D, VFX and renders, saved
+          and shared daily.
         </p>
-      </div>
 
-      <nav className="flex flex-col gap-[2px]">
-        <a href="#" className={`${linkCls} text-ink`}>Work</a>
-        <a href="#" className={linkCls}>About</a>
-        <a href="mailto:hello@motionvault.studio" className={linkCls}>
-          Support / Contact
-        </a>
-      </nav>
-
-      {/* auth / actions */}
-      <div className="flex flex-col gap-2">
-        {user ? (
-          <>
+        {/* Navigation — Hansler type scale preserved */}
+        <nav className="mt-6 flex flex-col gap-[2px]">
+          <Link
+            href="/"
+            className="w-fit py-1 text-[15px] font-medium leading-[1.2] tracking-[-0.01em] text-ink transition-colors hover:text-ink"
+          >
+            Work
+          </Link>
+          <Link
+            href="/about"
+            className="w-fit py-1 text-[15px] leading-[1.2] tracking-[-0.01em] text-[#6b6b6b] transition-colors hover:text-ink"
+          >
+            About
+          </Link>
+          <Link
+            href="/contact"
+            className="w-fit py-1 text-[15px] leading-[1.2] tracking-[-0.01em] text-[#6b6b6b] transition-colors hover:text-ink"
+          >
+            Contact
+          </Link>
+          <button
+            onClick={() => setSubmit(true)}
+            className="w-fit py-1 text-left text-[15px] leading-[1.2] tracking-[-0.01em] text-[#6b6b6b] transition-colors hover:text-ink"
+          >
+            Submit a post
+          </button>
+          {/* Stage 1 §4 — Login / Sign Up + Dashboard entry */}
+          {user ? (
             <button
               onClick={() => setDash(true, "saved")}
-              className="flex items-center gap-2.5 rounded-[12px] border border-line bg-white/70 p-2 text-left transition-colors hover:border-ink"
+              className="w-fit py-1 text-left text-[15px] leading-[1.2] tracking-[-0.01em] text-[#6b6b6b] transition-colors hover:text-ink"
             >
-              <Image
-                src={user.avatar}
-                alt={user.name}
-                width={32}
-                height={32}
-                className="h-8 w-8 rounded-full object-cover"
-              />
-              <span className="min-w-0">
-                <span className="block truncate text-[13px] font-medium">{user.name}</span>
-                <span className="block truncate text-[12px] text-fog">Open dashboard</span>
-              </span>
+              Dashboard
             </button>
-            <button
-              onClick={() => setSubmit(true)}
-              className="flex items-center justify-center gap-1.5 rounded-[12px] bg-ink py-2.5 text-[13px] font-medium text-paper transition-transform active:scale-[0.98]"
-            >
-              <IconPlus /> Submit post
-            </button>
-          </>
-        ) : (
-          <>
+          ) : (
             <button
               onClick={() => setAuth(true)}
-              className="rounded-[12px] bg-ink py-2.5 text-[13px] font-medium text-paper transition-transform active:scale-[0.98]"
+              className="w-fit py-1 text-left text-[15px] leading-[1.2] tracking-[-0.01em] text-[#6b6b6b] transition-colors hover:text-ink"
             >
               Login / Sign Up
             </button>
-            <button
-              onClick={() => setSubmit(true)}
-              className="flex items-center justify-center gap-1.5 rounded-[12px] border border-line-strong py-2.5 text-[13px] transition-colors hover:border-ink"
-            >
-              <IconPlus /> Submit post
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className="flex-1" />
-
-      {/* client demo shortcuts */}
-      <div className="rounded-[12px] border border-dashed border-line-strong p-3">
-        <p className="font-mono text-[10px] uppercase tracking-[0.07em] text-fog">
-          Client demo
-        </p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setDash(true, "saved")}
-            className="rounded-full border border-line-strong px-2.5 py-1 text-[12px] hover:border-ink"
-          >
-            Dashboard
-          </button>
+          )}
+          {/* Admin entry (demo CMS) */}
           <button
             onClick={() => setAdmin(true)}
-            className="relative rounded-full border border-line-strong px-2.5 py-1 text-[12px] hover:border-ink"
+            className="w-fit py-1 text-left font-mono text-[11px] uppercase tracking-[0.07em] text-[#6b6b6b] transition-colors hover:text-ink"
           >
             Admin
-            {pending.length > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-ink px-1 text-[10px] text-paper">
-                {pending.length}
-              </span>
-            )}
           </button>
-        </div>
+        </nav>
       </div>
 
-      <div className="flex flex-col gap-2">
+      {/* Footer — Stage 1 §4: copyright, socials, contact */}
+      <div className="flex flex-col gap-4">
         <div className="flex items-start gap-2">
           <AvailabilityDot />
-          <p className="text-[13px] leading-[1.45] text-smoke">
-            Open for artist submissions.
+          <p className="text-[13px] leading-[1.45] tracking-[-0.02em] text-[#6b6b6b]">
+            New motion work, curated daily.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-smoke transition-colors hover:border-ink hover:text-ink"
-          >
-            <IconIG />
-          </a>
+
+        <div className="h-px w-full bg-line" />
+
+        <div className="flex flex-col gap-1.5">
+          {/* Support / Contact → Gmail */}
           <a
             href="mailto:hello@motionvault.studio"
-            aria-label="Email"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-line text-smoke transition-colors hover:border-ink hover:text-ink"
+            className="text-[15px] leading-[1.2] tracking-[-0.01em] text-ink hover:underline"
           >
-            <IconMail />
+            hello@motionvault.studio
           </a>
+          <div className="flex items-center gap-3 pt-1 text-[13px] text-[#6b6b6b]">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 transition-colors hover:text-ink"
+            >
+              Instagram <IconArrow />
+            </a>
+            <a
+              href="https://x.com"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 transition-colors hover:text-ink"
+            >
+              X <IconArrow />
+            </a>
+            <a
+              href="mailto:hello@motionvault.studio"
+              className="flex items-center gap-1 transition-colors hover:text-ink"
+            >
+              Support <IconArrow />
+            </a>
+          </div>
         </div>
-        <div className="my-[6px] h-px bg-line" />
-        <div className="text-[13px] leading-[1.5] text-fog">
+
+        <div className="flex flex-col gap-0.5 font-mono text-[11px] uppercase tracking-[0.07em] text-[#6b6b6b]">
           <p>© 2026 Motion Vault</p>
-          <p className="mt-1">Curated motion inspiration.</p>
+          <p>Demo — mock data, no backend</p>
         </div>
       </div>
     </aside>

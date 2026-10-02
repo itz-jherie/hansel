@@ -15,10 +15,10 @@ export function Pill({
     <button
       onClick={onClick}
       className={cn(
-        "whitespace-nowrap rounded-[15px] border px-3 py-[7px] text-[13px] leading-[1.15] tracking-[-0.005em] transition-colors duration-[250ms] active:scale-[0.97]",
+        "whitespace-nowrap rounded-[15px] border px-3 py-[6px] text-[13px] leading-[1.15] tracking-[-0.005em] transition-colors duration-200 active:scale-[0.98] cursor-pointer",
         active
           ? "border-ink bg-ink text-paper"
-          : "border-line-strong bg-transparent text-ink hover:border-ink"
+          : "border-line bg-transparent text-[#4d4d4d] hover:border-ink hover:text-ink"
       )}
     >
       {children}
@@ -33,8 +33,8 @@ export function FilterPills({
   value: string;
   onChange: (v: string) => void;
 }) {
-return (
-    <div className="no-scrollbar flex flex-nowrap gap-2 overflow-x-auto">
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
       {categories.map((c) => (
         <Pill key={c.id} active={value === c.id} onClick={() => onChange(c.id)}>
           {c.label}

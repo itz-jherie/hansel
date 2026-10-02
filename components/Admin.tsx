@@ -2,7 +2,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { useDemo } from "@/lib/demo-store";
-import { imgUrl } from "@/data/projects";
+import { imgUrl, catLabel } from "@/data/projects";
 import { categories, type Category } from "@/lib/tokens";
 import {
   Field,
@@ -82,16 +82,16 @@ export function Admin() {
             {review ? (
               <div className="rounded-[12px] border border-line p-4">
                 <div className="flex flex-col gap-4 min-[810px]:flex-row">
-                  <Image src={imgUrl(review.seed, 500, 400)} alt="" width={320} height={240} className="h-44 w-full rounded-[8px] object-cover min-[810px]:w-56" />
+                  <Image src={review.image || imgUrl(review.seed, 500, 400)} alt="" width={320} height={240} className="h-44 w-full rounded-[8px] object-cover min-[810px]:w-56" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[16px] font-medium">@{review.username}</p>
-                    <p className="mt-0.5 font-mono text-[12px] text-fog">{review.category} · Draft/Pending</p>
+                    <p className="text-[16px] font-medium">@{review.username || review.title}</p>
+                    <p className="mt-0.5 font-mono text-[12px] text-fog">{catLabel(review.category)} · Draft/Pending</p>
                     <p className="mt-2 truncate font-mono text-[12px]">{review.originalLink}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <a href={review.originalLink} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-[10px] border border-line-strong px-3 py-2 text-[13px] hover:border-ink">
                         <IconExternal /> Open submission
                       </a>
-                      <GhostBtn onClick={() => d.copy(review.originalLink)}>
+                      <GhostBtn onClick={() => d.copy(review.originalLink ?? "")}>
                         <span className="flex items-center gap-1.5"><IconCopy /> Copy link</span>
                       </GhostBtn>
                     </div>
@@ -120,14 +120,14 @@ export function Admin() {
               <div className="mt-2 flex flex-col gap-2">
                 {pending.map((p) => (
                   <div key={p.id} className="flex items-center gap-3 rounded-[12px] border border-line p-3">
-                    <Image src={imgUrl(p.seed, 160, 160)} alt="" width={48} height={48} className="h-12 w-12 rounded-[8px] object-cover" />
+                    <Image src={p.image || imgUrl(p.seed, 160, 160)} alt="" width={48} height={48} className="h-12 w-12 rounded-[8px] object-cover" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-medium">@{p.username}</p>
-                      <p className="truncate font-mono text-[11px] text-fog">{p.category} · {p.originalLink}</p>
+                      <p className="truncate text-[14px] font-medium">@{p.username || p.title}</p>
+                      <p className="truncate font-mono text-[11px] text-fog">{catLabel(p.category)} · {p.originalLink}</p>
                     </div>
                     <span className="hidden rounded-full bg-cloud px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.06em] text-smoke min-[810px]:block">Pending</span>
                     <button onClick={() => setReviewId(p.id)} className="rounded-[10px] border border-line-strong px-3 py-2 text-[13px] hover:border-ink">Open</button>
-                    <button onClick={() => d.copy(p.originalLink)} aria-label="Copy link" className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-line-strong hover:border-ink"><IconCopy /></button>
+                    <button onClick={() => d.copy(p.originalLink ?? "")} aria-label="Copy link" className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-line-strong hover:border-ink"><IconCopy /></button>
                     <button onClick={() => d.approve(p.id)} aria-label="Approve" className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-ink text-paper"><IconCheck /></button>
                     <button onClick={() => d.reject(p.id)} aria-label="Reject" className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-red-300 text-red-600"><IconClose /></button>
                   </div>
@@ -141,8 +141,8 @@ export function Admin() {
           <div className="mt-4 grid grid-cols-2 gap-3 min-[810px]:grid-cols-4">
             {posts.slice(0, 12).map((p) => (
               <div key={p.id} className="overflow-hidden rounded-[8px] border border-line">
-                <Image src={imgUrl(p.seed, 300, 300)} alt="" width={300} height={300} className="aspect-square w-full object-cover" />
-                <p className="truncate px-2 py-1.5 font-mono text-[11px]">@{p.username}</p>
+                <Image src={p.image || imgUrl(p.seed, 300, 300)} alt="" width={300} height={300} className="aspect-square w-full object-cover" />
+                <p className="truncate px-2 py-1.5 font-mono text-[11px]">@{p.username || p.title}</p>
               </div>
             ))}
           </div>

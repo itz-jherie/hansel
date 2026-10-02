@@ -36,7 +36,9 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(26, 127, 55, 0); }
 }
 
-/* Reveal — matches Framer: opacity 0 + translateY(18px) scale(.985) */
+/* Reveal — matches Framer: opacity 0 + translateY(18px) scale(.985).
+   Safety: if the IntersectionObserver never fires (error overlay, JS hiccup,
+   old cached CSS), cards fade in anyway after 1.2s instead of staying invisible. */
 .reveal {
   opacity: 0;
   transform: translateY(18px) scale(0.985);
@@ -44,10 +46,18 @@ body {
     opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
+  animation: reveal-failsafe 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.2s forwards;
 }
 .reveal.in {
   opacity: 1;
   transform: none;
+  animation: none;
+}
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

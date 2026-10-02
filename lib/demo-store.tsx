@@ -13,7 +13,11 @@ import {
   seedPending,
   type Post,
 } from "@/data/projects";
-import type { Category } from "@/lib/tokens";
+import {
+  normalizeCategory,
+  type Category,
+  type SortMode,
+} from "@/lib/tokens";
 
 export type DemoUser = {
   name: string;
@@ -36,6 +40,12 @@ type Store = {
   dashOpen: boolean;
   dashTab: string;
   adminOpen: boolean;
+  filter: string;
+  sort: SortMode;
+  query: string;
+  setFilter: (v: string) => void;
+  setSort: (v: SortMode) => void;
+  setQuery: (v: string) => void;
   toast: (msg: string) => void;
   toasts: Toast[];
   login: () => void;
@@ -61,6 +71,7 @@ type Store = {
   activePost: Post | null;
   savedPosts: Post[];
   myPosts: Post[];
+  visiblePosts: Post[];
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -80,7 +91,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState<Post[]>(seedPending);
   const [saved, setSaved] = useState<string[]>([]);
   const [usernames, setUsernames] = useState<string[]>(() =>
-    Array.from(new Set(seedPosts.map((p) => p.username)))
+    Array.from(new Set(seedPosts.map((p) => p.username || p.slug)))
   );
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const [authOpen, setAuth] = useState(false);
@@ -88,22 +99,68 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [dashOpen, setDashOpen] = useState(false);
   const [dashTab, setDashTab] = useState("saved");
   const [adminOpen, setAdmin] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [sort, setSort] = useState<SortMode>("recent");
+  const [query, setQuery] = useState("");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
+  // Migrate legacy template posts (web/product/…) + persisted localStorage data
+  // to the 4 motion categories. Runs once after hydration reads.
+  const migrate = useCallback((list: Post[]): Post[] => {
+    let changed = false;
+    const FALLBACK_IMG =
+      "https://picsum.photos/seed/motion-vault/800/600";
+    const next = list.map((p) => {
+      const fixed = normalizeCategory(String(p.category ?? "3d-motion"));
+      const uname =
+        p.username?.trim() || p.title?.trim() || p.slug || "artist";
+      const img = p.image?.trim() ? p.image : FALLBACK_IMG;
+      // Never emit empty-string media URLs — Next/Image throws on src="".
+      const video = p.video?.trim() ? p.video : null;
+      const link = p.originalLink?.trim() ? p.originalLink : img;
+      if (
+        fixed !== p.category ||
+        uname !== p.username ||
+        img !== p.image ||
+        video !== p.video ||
+        link !== p.originalLink
+      ) {
+        changed = true;
+        return {
+          ...p,
+          category: fixed,
+          username: uname,
+          title: uname,
+          image: img,
+          video,
+          originalLink: link,
+        };
+      }
+      return p;
+    });
+    void changed;
+    return next;
+  }, []);
+
   useEffect(() => {
-    setUser(load<DemoUser | null>("demo.user", null));
+    // Guard against stale/corrupt persisted data from older builds
+    // (empty-string or missing image/link/video fields new code treats as errors).
+    const rawUser = load<DemoUser | null>("demo.user", null);
+    if (rawUser && !rawUser.avatar?.trim())
+      rawUser.avatar = "https://picsum.photos/seed/demo-user/112/112";
+    setUser(rawUser);
     setSaved(load<string[]>("demo.saved", []));
-    setPosts(load<Post[]>("demo.posts", seedPosts));
-    setPending(load<Post[]>("demo.pending", seedPending));
+    setPosts(migrate(load<Post[]>("demo.posts", seedPosts)));
+    setPending(migrate(load<Post[]>("demo.pending", seedPending)));
     setUsernames(
       load<string[]>(
         "demo.usernames",
-        Array.from(new Set(seedPosts.map((p) => p.username)))
+        Array.from(new Set(seedPosts.map((p) => p.username || p.slug)))
       )
     );
     setHydrated(true);
-  }, []);
+  }, [migrate]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -186,10 +243,15 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       const uname = input.username.trim().replace(/^@/, "");
       const item: Post = {
         id: `u-${Date.now()}`,
-        seed: `demo-user-${Date.now() % 997}`,
+        slug: uname.toLowerCase().replace(/[^a-z0-9]+/g, "-") || `item-${Date.now() % 997}`,
+        title: uname || "Submission",
+        year: "2026",
+        category: input.category,
+        aspectRatio: 1.5,
+        image: "https://picsum.photos/seed/submission/800/600",
+        alt: uname || "Submission",
         username: uname || user?.instagram || "you",
         originalLink: input.link.trim(),
-        category: input.category,
         views: 0,
         likes: 0,
         createdAt: Date.now(),
@@ -220,7 +282,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       // future artist matching: link admin-created posts with same username
       setPosts((ps) => {
         const matched = ps.filter(
-          (p) => p.username.toLowerCase() === uname.toLowerCase() && !p.mine
+          (p) => (p.username?.toLowerCase() ?? "") === uname.toLowerCase() && !p.mine
         );
         if (matched.length > 0)
           setTimeout(
@@ -228,7 +290,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             300
           );
         return ps.map((p) =>
-          p.username.toLowerCase() === uname.toLowerCase() ? { ...p, mine: true } : p
+          (p.username?.toLowerCase() ?? "") === uname.toLowerCase() ? { ...p, mine: true } : p
         );
       });
       if (!usernames.includes(uname)) setUsernames((u) => [...u, uname]);
@@ -300,10 +362,15 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       const uname = input.username.trim().replace(/^@/, "");
       const item: Post = {
         id: `a-${Date.now()}`,
-        seed: `demo-admin-${Date.now() % 997}`,
+        slug: uname.toLowerCase().replace(/[^a-z0-9]+/g, "-") || `item-${Date.now() % 997}`,
+        title: uname,
+        year: "2026",
+        category: input.category,
+        aspectRatio: 1.5,
+        image: "https://picsum.photos/seed/admin/800/600",
+        alt: uname,
         username: uname,
         originalLink: input.link.trim(),
-        category: input.category,
         views: 0,
         likes: 0,
         createdAt: Date.now(),
@@ -328,6 +395,21 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   );
   const myPosts = useMemo(() => posts.filter((p) => p.mine), [posts]);
 
+  // Stage 1 §2.2: client-side Recent / Popular sort (no backend needed).
+  // Recent = createdAt desc, Popular = likes desc.
+  const visiblePosts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = filter === "all" ? [...posts] : posts.filter((p) => p.category === filter);
+    if (q)
+      list = list.filter((p) =>
+        `@${p.username ?? ""} ${p.title ?? ""}`.toLowerCase().includes(q)
+      );
+    list.sort((a, b) =>
+      sort === "popular" ? b.likes - a.likes : b.createdAt - a.createdAt
+    );
+    return list;
+  }, [posts, filter, sort, query]);
+
   const value: Store = {
     user,
     posts,
@@ -340,6 +422,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     dashOpen,
     dashTab,
     adminOpen,
+    filter,
+    sort,
+    query,
+    setFilter,
+    setSort,
+    setQuery,
+    visiblePosts,
     toast,
     toasts,
     login,
